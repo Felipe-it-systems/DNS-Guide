@@ -1,92 +1,85 @@
 # Análisis y Resolución del Sistema DNS
 
 | | |
-| :--- | :--- |
+|---|---|
 | **Módulo** | 0375 Servicios de red |
-| **Ciclo Formativo** | ASIX |
+| **Ciclo formativo** | ASIX |
 | **Alumno** | Felipe Rodríguez Gómez |
-| **Formato de Entrega** | URL al informe documentado en GitBook personal |
 
----
-
-## Objetivos
+## Objetivo
 
 Instalar y configurar servidores de DNS.
 
 ---
 
-## Preguntas
+# 1. Introducción
 
-### 1. ¿Qué función cumple el servicio DNS en la red y por qué es esencial para el funcionamiento de Internet?
+### ¿Qué función cumple el servicio DNS en la red y por qué es esencial para el funcionamiento de Internet?
 
-El DNS actúa como la "guía telefónica" de Internet: traduce los nombres de dominio que usamos los humanos (ej. google.com) a las direcciones IP que entienden las máquinas. Es esencial porque, sin él, tendríamos que memorizar direcciones IP numéricas para acceder a cualquier servicio, lo cual sería impracticable.
+El DNS actúa como la "guía telefónica" de Internet: traduce los nombres de dominio que usamos los humanos (ej. `google.com`) a las direcciones IP que entienden las máquinas. Es esencial porque, sin él, tendríamos que memorizar direcciones IP numéricas para acceder a cualquier servicio, lo cual sería impracticable.
 
-### 2. ¿Cómo se estructura la jerarquía del DNS y qué rol cumple cada nivel?
+### ¿Cómo se estructura la jerarquía del DNS y qué rol cumple cada nivel?
 
 El DNS se organiza como un árbol invertido con varios niveles:
 
-- **Raíz (.)**: Es el nivel más alto. Sabe quién gestiona cada dominio de primer nivel.
-- **TLD (Top Level Domain)**: Extensiones como .com, .org, .es. Saben quién es el servidor autoritativo de cada dominio de segundo nivel.
-- **Servidores Autoritativos**: Contienen los registros finales de un dominio (ej. google.com). Son la fuente de verdad de esa zona.
-- **Subdominios**: Niveles adicionales como www.google.com o mail.google.com. Cada nivel delega la responsabilidad en el siguiente.
+- **Raíz (`.`)**: es el nivel más alto. Sabe quién gestiona cada dominio de primer nivel.
+- **TLD (Top Level Domain)**: extensiones como `.com`, `.org`, `.es`. Saben quién es el servidor autoritativo de cada dominio de segundo nivel.
+- **Servidores autoritativos**: contienen los registros finales de un dominio (ej. `google.com`). Son la fuente de verdad de esa zona.
+- **Subdominios**: niveles adicionales como `www.google.com` o `mail.google.com`. Cada nivel delega la responsabilidad en el siguiente.
 
-### 3. ¿Cuál es la diferencia entre un servidor DNS iterativo y un servidor recursivo?
+### ¿Cuál es la diferencia entre un servidor DNS iterativo y un servidor recursivo?
 
-- **Iterativo**: Responde con la mejor información que conoce. Si no tiene la respuesta final, devuelve una referencia al siguiente servidor al que hay que preguntar. Los servidores raíz y los TLD funcionan así.
-- **Recursivo**: Hace todo el trabajo por el cliente. Si no tiene la respuesta en su caché, consulta él mismo a los servidores raíz, TLD y autoritativos hasta obtener la respuesta final y se la devuelve ya resuelta. Los resolutores de los ISPs suelen ser recursivos.
+- **Iterativo**: responde con la mejor información que conoce. Si no tiene la respuesta final, devuelve una referencia al siguiente servidor al que hay que preguntar. Los servidores raíz y los TLD funcionan así.
+- **Recursivo**: hace todo el trabajo por el cliente. Si no tiene la respuesta en su caché, consulta él mismo a los servidores raíz, TLD y autoritativos hasta obtener la respuesta final y se la devuelve ya resuelta. Los resolutores de los ISPs suelen ser recursivos.
 
-### 4. ¿Qué son los registros de recursos (RR) en DNS y cuáles son los más importantes? Haz una lista.
+### ¿Qué son los registros de recursos (RR) en DNS y cuáles son los más importantes?
 
 Son las unidades de información que componen un archivo de zona. Los más importantes son:
 
-- **SOA**: Define el servidor primario de la zona.
-- **NS**: Indica los servidores autoritativos.
-- **A**: Asocia un nombre a una dirección IPv4.
-- **AAAA**: Asocia un nombre a una dirección IPv6.
-- **CNAME**: Crea un alias hacia otro nombre.
-- **MX**: Especifica los servidores de correo.
-- **PTR**: Se usa para la resolución inversa (IP → nombre).
-- **TXT**: Almacena información textual (verificaciones, SPF, etc.).
+| Registro | Función |
+|----------|---------|
+| **SOA** | Define el servidor primario de la zona |
+| **NS** | Indica los servidores autoritativos |
+| **A** | Asocia un nombre a una dirección IPv4 |
+| **AAAA** | Asocia un nombre a una dirección IPv6 |
+| **CNAME** | Crea un alias hacia otro nombre |
+| **MX** | Especifica los servidores de correo |
+| **PTR** | Se usa para la resolución inversa (IP → nombre) |
+| **TXT** | Almacena información textual (verificaciones, SPF, etc.) |
 
-### 5. ¿Qué vulnerabilidades existen en el servicio DNS y qué mecanismos de seguridad pueden mitigarlas?
+### ¿Qué vulnerabilidades existen en el servicio DNS y qué mecanismos de seguridad pueden mitigarlas?
 
 | Vulnerabilidad | Descripción | Mitigación |
-| :--- | :--- | :--- |
-| Envenenamiento de caché | Inyección de datos falsos en la caché de un resolutor. | DNSSEC, actualización de software. |
-| Spoofing | Suplantación de la identidad de un servidor DNS. | DNSSEC, DNS over TLS/HTTPS (DoT/DoH). |
-| Ataques de amplificación | Uso de servidores abiertos para inundar a una víctima (DDoS). | Restringir la recursión (allow-recursion). |
-| Transferencias no autorizadas | Obtención de una copia completa de la zona. | Limitar con allow-transfer. |
+|----------------|-------------|------------|
+| Envenenamiento de caché | Inyección de datos falsos en la caché de un resolutor | DNSSEC, actualización de software |
+| Spoofing | Suplantación de la identidad de un servidor DNS | DNSSEC, DNS over TLS/HTTPS (DoT/DoH) |
+| Ataques de amplificación | Uso de servidores abiertos para inundar a una víctima (DDoS) | Restringir la recursión (`allow-recursion`) |
+| Transferencias no autorizadas | Obtención de una copia completa de la zona | Limitar con `allow-transfer` |
 
 ---
 
-## Reporte técnico
+# 2. Reporte técnico
 
-### Introducción
-
-En esta práctica se ha instalado y configurado un servidor DNS autoritativo con BIND9 sobre Ubuntu Server, dentro de una máquina virtual. El servidor resuelve el dominio tudominio.local de forma directa e inversa para la red 192.168.1.0/24, y reenvía las consultas externas a servidores públicos para tener acceso a Internet.
-
-### Características de hardware y del sistema operativo
+## 2.1 Características de hardware y sistema operativo
 
 | Componente | Valor |
-| :--- | :--- |
-| Sistema operativo | Ubuntu 26.04.1 LTS (Resolute) |
-| Kernel | 7.0.0-34-generic |
-| CPU | Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz |
-| RAM | 3,3 GiB |
-| Swap | 2,0 GiB |
-| Disco | 12 GB (5,3 GB libres) |
-| Hostname | felipe |
-| Versión de BIND | BIND 9.20.24-1ubuntu0.3-Ubuntu |
-| Interfaz NAT | enp0s3 → 10.0.2.15/24 (DHCP) |
-| Interfaz Red Interna | enp0s8 → 192.168.1.10/24 (estática) |
+|------------|-------|
+| **Sistema operativo** | Ubuntu 26.04.1 LTS (Resolute) |
+| **RAM** | 4 GB |
+| **CPU** | 2 |
+| **Disco** | 20 GB |
+| **Interfaz NAT** | `enp0s3` → 10.0.2.15/24 (DHCP) |
+| **Interfaz Red Interna** | `enp0s8` → 192.168.1.10/24 (estática) |
 
-### Desarrollo
+## 2.2 Desarrollo
 
-#### Configuración de red con Netplan
+### Configuración de red (Netplan)
+
+```bash
+sudo more /etc/netplan/00-installer-config.yaml
+```
 
 ```yaml
-felipe@felipe:~$ sudo more /etc/netplan/00-installer-config.yaml
-
 network:
   version: 2
   renderer: networkd
@@ -106,16 +99,16 @@ Aplicado con:
 sudo netplan apply
 ```
 
-#### Instalación de BIND9
+### Instalación de BIND9
 
 ```bash
 sudo apt update
 sudo apt install -y bind9 bind9-utils bind9-doc bind9-dnsutils
 ```
 
-#### Configuración global (`/etc/bind/named.conf.options`)
+### Configuración global (`/etc/bind/named.conf.options`)
 
-```text
+```conf
 options {
     directory "/var/cache/bind";
 
@@ -136,9 +129,9 @@ options {
 };
 ```
 
-#### Declaración de zonas (`/etc/bind/named.conf.local`)
+### Declaración de zonas (`/etc/bind/named.conf.local`)
 
-```text
+```conf
 zone "tudominio.local" {
     type master;
     file "/etc/bind/zones/db.tudominio.local";
@@ -150,9 +143,9 @@ zone "1.168.192.in-addr.arpa" {
 };
 ```
 
-#### Archivos de zona
+### Archivos de zona
 
-Zona directa (`/etc/bind/zones/db.tudominio.local`):
+**Zona directa** (`/etc/bind/zones/db.tudominio.local`)
 
 ```dns
 $TTL 86400
@@ -164,19 +157,19 @@ $TTL 86400
         86400       ; Negative Cache TTL
 )
 ;
-@         IN  NS      ns1.tudominio.local.
+@           IN  NS      ns1.tudominio.local.
 ;
-ns1       IN  A       192.168.1.10
-servidor1 IN  A       192.168.1.20
-pc-cliente IN A       192.168.1.30
+ns1         IN  A       192.168.1.10
+servidor1   IN  A       192.168.1.20
+pc-cliente  IN  A       192.168.1.30
 ;
-www       IN  CNAME   servidor1.tudominio.local.
+www         IN  CNAME   servidor1.tudominio.local.
 ;
-@         IN  MX  10  mail.tudominio.local.
-mail      IN  A       192.168.1.40
+@           IN  MX  10  mail.tudominio.local.
+mail        IN  A       192.168.1.40
 ```
 
-Zona inversa (`/etc/bind/zones/db.192.168.1`):
+**Zona inversa** (`/etc/bind/zones/db.192.168.1`)
 
 ```dns
 $TTL 86400
@@ -188,133 +181,15 @@ $TTL 86400
         86400
 )
 ;
-@       IN  NS  ns1.tudominio.local.
+@   IN  NS  ns1.tudominio.local.
 ;
-10      IN  PTR ns1.tudominio.local.
-20      IN  PTR servidor1.tudominio.local.
-30      IN  PTR pc-cliente.tudominio.local.
+10  IN  PTR ns1.tudominio.local.
+20  IN  PTR servidor1.tudominio.local.
+30  IN  PTR pc-cliente.tudominio.local.
 ```
 
-#### Validación de sintaxis
+### Validación de sintaxis
 
-```bash
-felipe@felipe:~$ sudo named-checkconf
-felipe@felipe:~$ sudo named-checkzone tudominio.local /etc/bind/zones/db.tudominio.local
-zone tudominio.local/IN: loaded serial 2024092801
-OK
-felipe@felipe:~$ sudo named-checkzone 1.168.192.in-addr.arpa /etc/bind/zones/db.192.168.1
-zone 1.168.192.in-addr.arpa/IN: loaded serial 2024092801
-OK
-```
-
-#### Pruebas de resolución
-
-```bash
-felipe@felipe:~$ dig @localhost servidor1.tudominio.local
-
-; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @localhost servidor1.tudominio.local
-; (1 server found)
-;; global options: +cmd
-;; Got answer:
-;; WARNING: .local is reserved for Multicast DNS
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 2828
-;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
-
-;; QUESTION SECTION:
-;servidor1.tudominio.local.     IN      A
-
-;; ANSWER SECTION:
-servidor1.tudominio.local. 86400 IN     A       192.168.1.20
-```
-
-### Análisis de incidencias técnicas
-
-**Aviso .local**: al hacer dig aparecía el mensaje `WARNING: .local is reserved for Multicast DNS`. No es un error, pero es una mala práctica en entornos reales, ya que .local está reservado para mDNS. En producción sería recomendable usar otro dominio como tudominio.lan o tudominio.internal.
-
-### Conclusiones
-
-He dejado un servidor DNS funcional con BIND9 sobre Ubuntu Server, con zonas directa e inversa configuradas, y registros A, CNAME, MX y PTR verificados mediante dig. He aprendido a configurar direcciones IP estáticas con Netplan en escenarios con varios adaptadores de red, a distinguir los tipos de red de VirtualBox (NAT, red interna y Host-Only) y a diagnosticar problemas de resolución con herramientas como dig, ss y ufw.
-
----
-
-## Manual de usuario
-
-### Archivos de configuración
-
-- `/etc/bind/named.conf.options` → configuración global del servidor.
-- `/etc/bind/named.conf.local` → declaración de las zonas.
-- `/etc/bind/zones/db.tudominio.local` → zona directa (nombre a IP).
-- `/etc/bind/zones/db.192.168.1` → zona inversa (IP a nombre).
-
-### Configuración global
-
-En `named.conf.options` se define:
-
-- `listen-on { any; }` para escuchar en todas las interfaces.
-- `allow-query` y `allow-recursion` limitados a localhost, 192.168.1.0/24 y 192.168.56.0/24.
-- `allow-transfer { none; }` para no permitir transferencias de zona.
-- `forwarders` apuntando a 8.8.8.8 y 1.1.1.1 para consultas externas.
-- `dnssec-validation auto` y `querylog yes`.
-
-### Declaración de zonas
-
-En `named.conf.local` se declaran:
-
-- Zona directa: tudominio.local → archivo db.tudominio.local.
-- Zona inversa: 1.168.192.in-addr.arpa → archivo db.192.168.1.
-
-### Zonas
-
-La zona directa contiene el SOA con serial 2024092801, el NS ns1.tudominio.local, registros A para ns1 (192.168.1.10), servidor1 (192.168.1.20) y pc-cliente (192.168.1.30), un CNAME para www hacia servidor1, y un MX con su registro A para mail (192.168.1.40).
-
-La zona inversa contiene el SOA con el mismo serial, el NS ns1.tudominio.local y los PTR de las IPs 10, 20 y 30.
-
-### Añadir un host
-
-1. Editar `db.tudominio.local` y añadir una línea tipo: `nuevo-host IN A 192.168.1.50`.
-2. Subir el serial del SOA, por ejemplo a 2024092802.
-3. Si se quiere resolución inversa, añadir el PTR en `db.192.168.1`.
-4. Validar y reiniciar.
-
-### Validar y reiniciar
-
-```bash
-sudo named-checkconf
-sudo named-checkzone tudominio.local /etc/bind/zones/db.tudominio.local
-sudo named-checkzone 1.168.192.in-addr.arpa /etc/bind/zones/db.192.168.1
-sudo systemctl restart bind9
-```
-
-Si los tres primeros devuelven OK, se puede reiniciar sin problema.
-
-### Comandos útiles
-
-- `sudo systemctl status bind9` → ver estado.
-- `sudo systemctl restart bind9` → reiniciar.
-- `sudo named-checkconf` → validar configuración.
-- `sudo named-checkzone zona archivo` → validar una zona.
-- `dig @localhost nombre.dominio` → consulta directa.
-- `dig @localhost -x IP` → consulta inversa.
-- `sudo journalctl -u bind9 -f` → ver logs.
-
-### Diagnóstico rápido
-
-- Si no arranca: revisar con `sudo named-checkconf`.
-- Si no resuelve: revisar zonas y validarlas con `named-checkzone`.
-- Si no responde a la red: abrir el puerto 53 con `sudo ufw allow 53/udp` y `sudo ufw allow 53/tcp`.
-- Si falla la inversa: comprobar que la zona sea la IP invertida + `.in-addr.arpa`.
-
-### Seguridad
-
-- Restringir `allow-query` a la red local.
-- `allow-transfer { none; }` para no permitir transferencias.
-- No permitir recursión abierta.
-- Mantener el sistema actualizado.
-
----
-
-## Links
-
-1. Instalar Bind9: https://www.isc.org/bind/
-2. Configurar las IP con NetPlan: https://netplan.io
-3. https://punkymo.gitbook.io
+```console
+$ sudo named-checkconf
+$ sudo named-checkzone
